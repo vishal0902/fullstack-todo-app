@@ -74,4 +74,24 @@ router.delete('/delete', auth, async (req, res)=>{
     })
 })
 
+
+router.get('/getTodos', auth, async (req, res)=>{
+    const todos = await prisma.todo.findMany({
+        where:{
+            userId: req.userId
+        },
+        select:{
+            id: true,
+            title: true,
+            description: true,
+            done: true
+        }
+    })
+    res.status(201).json({
+        message: "success",
+        todos: todos
+    })
+})
+
+
 module.exports = router

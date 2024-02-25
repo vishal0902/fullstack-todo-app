@@ -11,6 +11,7 @@ const prisma = new PrismaClient();
 const express = require("express");
 
 const jwt = require("jsonwebtoken");
+const auth = require("../middlewares/auth");
 
 const router = express.Router();
 
@@ -19,14 +20,14 @@ router.post("/signup", async (req, res) => {
 
   try {
     
-    const existingUser = await prisma.user.findFirst({
+    const existingUser = await prisma.user.findUnique({
       where: {
-        email: email,
+        email: email
       }
     })
     
     if(existingUser) {
-      return res.json(401).json({
+      return res.status(401).json({
         message: "Email already taken."
       })
     }
@@ -40,31 +41,34 @@ router.post("/signup", async (req, res) => {
       },
       select: {
         id: true,
-        firstName: true,
       },
     });
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+    const token = jwt.sign({
+      userId: user.id
+    }, process.env.JWT_SECRET)
 
-    res
-      .status(201)
-      .json({
-        msg: "User created successfully",
-        data: { user: user, token: token },
-      });
+    res.status(201).json({
+      message: "success",
+      token: token
+    })
+
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    res.status(401).json({
+      message: "Some error happened",
+      error: error
+    });
   }
 });
 
 router.post("/signin", async (req, res)=>{
-  const {email, password } = req.body
+  const {email, password} = req.body
 
   try {
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findUnique({
       where: {
-        email,
-        password 
+        email: email, 
+        password: password
       }
     })
     
@@ -84,16 +88,30 @@ router.post("/signin", async (req, res)=>{
 
   } catch (error) {
     res.status(401).json({
-      message: "Some error occured",
+      message: "Some error happened",
       error: error
     })
   }
   
-  
+  })
 
 
+router.get('/getUserData', auth, async (req, res)=>{
+   const userData = await prisma.user.findUnique({
+     where: {
+      id: req.userId
+     },
+     select: {
+      firstName:true,
+      lastName: true,
+      todos: true
+     }
+   })
+   res.status(201).json({
+    message: "success",
+    userData: userData
+   })
 })
-
 
 
 
