@@ -5,22 +5,9 @@ import Button from '../ui/Button'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import TextArea from '../ui/TextArea'
+import Loader from '../ui/Loader'
 
-export default function AddTodo({title, description, setTitle, setDescription, addTodo}) {
-
-    // const [title, setTitle] = useState('')
-    // const [description, setDescription] = useState('')
-
-    // const navigate = useNavigate()
-
-    // const addTodo = async () =>{
-    //     await axios.post("http://localhost:3000/api/v1/todo/add",{
-    //         title,
-    //         description
-    //     },{headers:{Authorization:`Bearer ${localStorage.getItem('token')}`}})
-    //     // console.log(response.data)
-
-    // }
+export default function AddTodo({title, description, setTitle, setDescription, addTodo, addTodoLoader, setAddTodoLoader}) {
 
 
   return (
@@ -32,7 +19,10 @@ export default function AddTodo({title, description, setTitle, setDescription, a
                 <InputBox type="text" value={title} onChange={(e:any)=>setTitle(e.target.value)} label="Title" placeholder="Title here" />
                 <TextArea value={description} onChange={(e:any)=>setDescription(e.target.value)} label="Description" placeholder="Desciption here" />
                 {/* <InputBox type="text" value={description} onChange={(e:any)=>setDescription(e.target.value)} label="Description" placeholder="Desciption here" /> */}
-                <Button  buttonText="Add Todo" onClick = {addTodo} />
+                
+                {addTodoLoader ? <div className='flex justify-center'><Loader /></div>:<Button  buttonText="Add Todo" onClick = {addTodo} />}
+                
+                
                
             </div>
     </div>
